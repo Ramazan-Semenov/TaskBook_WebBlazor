@@ -1,0 +1,134 @@
+﻿@page "/Error"
+@using System.Diagnostics
+
+<PageTitle>Error</PageTitle>
+
+<h1 class="text-danger">Error.</h1>
+<h2 class="text-danger">An error occurred while processing your request.</h2>
+
+
+
+
+
+@if (ShowRequestId)
+{
+    <p>
+        <strong>Request ID:</strong> <code>@RequestId</code>
+    </p>
+}
+
+<h3>Development Mode</h3>
+<p>
+    Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.
+</p>
+<p>
+    <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
+    It can result in displaying sensitive information from exceptions to end users.
+    For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
+    and restarting the app.
+</p>
+
+@code{
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
+
+    private string? RequestId { get; set; }
+    private bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+
+    protected override void OnInitialized() =>
+        RequestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;
+}
+
+@* <script>
+     var table = $("#table");
+
+    var isMouseDown = false;
+    var startRowIndex = null;
+    var startCellIndex = null;
+
+    function selectTo(cell) {
+
+        var row = cell.parent();
+        var cellIndex = cell.index();
+        var rowIndex = row.index();
+
+        var rowStart, rowEnd, cellStart, cellEnd;
+        document.getElementById("RowIndex1").textContent=rowIndex;
+        document.getElementById("RowIndex2").textContent="newtext";
+        if (rowIndex < startRowIndex) {
+            rowStart = rowIndex;
+            rowEnd = startRowIndex;
+        } else {
+            rowStart = startRowIndex;
+            rowEnd = rowIndex;
+        }
+
+        if (cellIndex < startCellIndex) {
+            cellStart = cellIndex;
+            cellEnd = startCellIndex;
+        } else {
+            cellStart = startCellIndex;
+            cellEnd = cellIndex;
+        }
+
+        for (var i = rowStart; i <= rowEnd; i++) {
+            var rowCells = table.find("tr").eq(i).find("td");
+            for (var j = cellStart; j <= cellEnd; j++) {
+                rowCells.eq(j).addClass("selected");
+            }
+        }
+    }
+    table.find("td").mousedown(function (e) {
+        isMouseDown = true;
+        var cell = $(this);
+
+        table.find(".selected").removeClass("selected"); // deselect everything
+
+        if (e.shiftKey) {
+            selectTo(cell);
+        } else {
+            cell.addClass("selected");
+            startCellIndex = cell.index();
+            startRowIndex = cell.parent().index();
+        }
+
+        return false; // prevent text selection
+    })
+    .mouseover(function () {
+        if (!isMouseDown) return;
+        table.find(".selected").removeClass("selected");
+        selectTo($(this));
+    })
+    .bind("selectstart", function () {
+        return false;
+    });
+
+    $(document).mouseup(function () {
+        isMouseDown = false;
+    });
+</script> *@
+
+
+@* <tbody>
+    @foreach (var item in DataContext.Task_Books)
+    {
+        <tr @onclick="@(() => DataContext.SelectedRowData(item))">
+            <th>@item.ID</th>
+            <th>@item.ParentID</th>
+            <th>@item.Department_Name</th>
+            <th>@item.Department_Name</th>
+            <th>@item.DateTime_START</th>
+            <th>@item.DateTime_END</th>
+            <th>@item.Status</th>
+            <th>@item.Type_Task</th>
+            <th>@item.Name</th>
+            <th>@item.Category_Task</th>
+            <th>@item.Priority</th>
+            <th>@item.Excecuter</th>
+            <th>@item.Dectription</th>
+            <th>@item.Labor_costs</th>
+        </tr>
+    }
+
+</tbody> *@
+

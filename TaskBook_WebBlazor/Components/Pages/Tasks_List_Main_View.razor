@@ -1,0 +1,283 @@
+﻿@page "/"
+
+@rendermode InteractiveServer
+@inject IJSRuntime JsRuntime
+@using System.Diagnostics;
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using TaskBook_WebBlazor.Entity;
+@using TaskBook_WebBlazor.ViewModel;
+@using BootstrapBlazor.Components;
+@using BootstrapBlazor;
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+<script type="text/javascript" src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+<div class="tab-content" id="content-1">
+    @*   <div id="" style="text-align: center; margin-bottom:10px; margin-top:10px;">
+        <RadzenButton/>
+        <input type="button" @onclick="async()=>{await DataContext.Create_Task(new Task_Book());}" value="Создать">
+        <input type="button" @onclick="async()=>{await DataContext.Edit_Task(currentItem?.FirstOrDefault());}" value="Изменить" />
+        <input type="button" @onclick="async()=>{await DataContext.Create_On_Task(currentItem?.FirstOrDefault());}" value="Создать на основании" />
+        <input type="button" @onclick="async()=>{await DataContext.Delete_Task(currentItem?.FirstOrDefault());}" value="Удалить" />
+    </div> *@
+    <div style="text-align: center; margin-bottom:10px; margin-top:10px;">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+            <RadzenButton onmousedown="ShowModalTaskFunc()"
+                Text="Создать" ButtonStyle="Radzen.ButtonStyle.Primary" />
+            <RadzenButton Click=@(async(args) =>{ await DataContext.Edit_Task(currentItem?.FirstOrDefault()); }) Text="Изменить" ButtonStyle="Radzen.ButtonStyle.Secondary" />
+            <RadzenButton Click=@(async(args) =>{ await DataContext.Create_On_Task(currentItem?.FirstOrDefault()); }) Text="Создать на основании" ButtonStyle="Radzen.ButtonStyle.Base" />
+            <RadzenButton Click=@(async(args) =>{ await DataContext.Delete_Task(currentItem?.FirstOrDefault()); }) Text="Удалить" ButtonStyle="Radzen.ButtonStyle.Base" />
+
+        </RadzenStack>
+    </div>
+
+    <div class="scrollable">
+        <RadzenDataGrid Data="@DataContext.Task_Books"
+        AllowFiltering="true"
+        FilterPopupRenderMode="PopupRenderMode.OnDemand"
+        FilterMode="FilterMode.Advanced"
+        AllowPaging="true"
+        AllowSorting="true"
+        lang="ru"
+        SelectionMode="DataGridSelectionMode.Single"
+        @bind-Value=@currentItem
+        GridLines="Radzen.DataGridGridLines.Both">
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(Task_Book.ID)" Title="ID" />
+                <RadzenDataGridColumn Property="@nameof(Task_Book.ParentID)" Title="Родительский ID" />
+                <RadzenDataGridColumn Property="@nameof(Task_Book.Department_Name)" Title="Подразделение" />
+                <RadzenDataGridColumn Property="@nameof(Task_Book.Group_Name)" Title="Группа" />
+                <RadzenDataGridColumn Property="@nameof(Task_Book.DateTime_START)" Title="Начало" />
+                <RadzenDataGridColumn Property="@nameof(Task_Book.DateTime_END)" Title="Конец" />
+                <RadzenDataGridColumn Property="@nameof(Task_Book.Status)" Title="Статус" />
+                <RadzenDataGridColumn Property="@nameof(Task_Book.Type_Task)" Title="Тип задачи" />
+                <RadzenDataGridColumn Property="@nameof(Task_Book.Name)" Title="Название задачи" />
+                <RadzenDataGridColumn Property="@nameof(Task_Book.Category_Task)" Title="Категория" />
+                <RadzenDataGridColumn Property="@nameof(Task_Book.Excecuter)" Title="Исполнитель" />
+                <RadzenDataGridColumn Property="@nameof(Task_Book.Dectription)" Title="Описание" />
+                <RadzenDataGridColumn Property="@nameof(Task_Book.Labor_costs)" Title="Трудозатраты(План/Факт), час" />
+            </Columns>
+        </RadzenDataGrid>
+
+    </div>
+
+
+
+    <style>
+        .rz-state-highlight{
+        background: Lightblue;
+        }
+        .selected-@currentItem?.GetHashCode() {
+        background: Lightblue;
+        }
+
+        .selected-@hovercurrentItem?.GetHashCode() {
+        background: lightgreen;
+        }
+        td{
+        user-select: none;
+        }
+
+        .content{
+
+        height:30px;
+        width:100%;
+        padding: 0 !important;
+        user-select: none;
+
+        }
+        .cn{
+
+        font-size:11px;
+        display:block;
+        }
+
+        .rz-grid-table {
+        width: unset;
+        }
+
+        .rz-data-grid {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        }
+
+        .rz-datatable {
+        position: relative;
+        box-shadow: var(--rz-grid-shadow);
+        border: var(--rz-grid-cell-border);
+        border-radius: var(--rz-grid-border-radius);
+        background-color: var(--rz-grid-background-color);
+        overflow: visible;
+        }
+
+        .scrollable {
+        max-width: 2000px;
+        width: 100vw;
+        }
+
+        .rz-datatable-scrollable {
+        display: flex;
+        flex-direction: column
+        }
+
+    </style>
+
+</div>
+<style>
+    .flex-container-Column {
+    display: flex;
+    flex-direction:column;
+    }
+    .flex-container {
+    display: flex;
+    flex-direction:row;
+    }
+</style>
+<div id="myModal" style="display:none;border:1px solid black;">
+    <div class="flex-container-Column">
+        <a>Наименование задачи</a>
+        <input type="text" placeholder="Наименование задачи" value="" />
+    </div>
+    <div class="flex-container">
+        <div class="flex-container-Column" style="width:100%; margin: 12px 50px 0px 0px;">
+            <a>Тип Задачи</a>
+            <RadzenDropDown Data=@typeTasks TValue="TypeTask"
+                            Placeholder="Тип задачи"
+                TextProperty="Name" @bind-Value=@typeTask />
+        </div>
+        <div class="flex-container-Column" style="width:100%; margin: 0px 0px 50px 0px;">
+            <a>Период</a>
+            <div class="flex-container">
+                <div class="flex-container-Column">
+                    <a>Дата начала</a>
+                    <input type="datetime-local" placeholder="Дата начала">
+                </div>
+                <div class="flex-container-Column">
+                    <a>Дата окончания</a>
+                    <input type="datetime-local" placeholder="Дата окончания">
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="flex-container" style="margin: -25px 0px 0px 0px;">
+        <div class="flex-container-Column" style="width:100%; margin: 0px 50px 0px 0px;">
+            <a>Категория задачи</a>
+            <RadzenDropDown Data=@typeTasks TValue="TypeTask" 
+                Placeholder="Категория задачи"
+                TextProperty="Name" @bind-Value=@typeTask />
+        </div>
+        <div class="flex-container-Column" style="width:100%; margin: 0px 0px 50px 0px;">
+            <a>Трудозатраты</a>
+            <input type="number" style="height:40px" placeholder="Количество часов" />
+
+        </div>
+    </div>
+    <div class="flex-container" style="margin: -25px 0px 0px 0px;">
+        <div class="flex-container-Column" style="width:100%; margin: 0px 50px 0px 0px;">
+            <a>Статус</a>
+            <RadzenDropDown Data=@typeTasks TValue="TypeTask"
+                            Placeholder="Статус"
+                            TextProperty="Name" @bind-Value=@typeTask />
+        </div>
+        <div class="flex-container-Column" style="width:100%; margin: 0px 0px 50px 0px;">
+            <a>Группа</a>
+            <RadzenDropDown Data=@typeTasks TValue="TypeTask"
+                            Placeholder="Группа"
+                            TextProperty="Name" @bind-Value=@typeTask />
+        </div>
+        
+    </div>
+    <div class="flex-container" style="width:100%;">
+        <div class="flex-container-Column" style="width:100%;margin: -25px 0px 0px 0px;">
+            <a>Описание</a>
+            <RadzenTextArea style="width:100%;" Placeholder="Описание задачи">
+
+            </RadzenTextArea>
+        </div>
+   
+    </div>
+    <div class="flex-container-Column" style="width:100%; margin: 0px 0px 50px 0px;">
+        <a>Назначение исполнителя</a>
+        <RadzenDropDown Data=@typeTasks TValue="TypeTask"
+                        Placeholder="Исполнители"
+                        TextProperty="Name" @bind-Value=@typeTask />
+    </div>
+    <div class="flex-container" style="position: absolute;right:1%; margin:-25px 0px 0px 0px">
+        <input type="button" value="Сохранить" style="margin: 0px 50px 0px 0px;" />
+
+        <input type="button" value="Закрыть" onclick="CloseModalTaskFunc()" />
+    </div>
+   
+
+</div>
+
+<script>
+
+    function ShowModalTaskFunc()
+    {
+
+        $("#myModal").dialog({title: "Задача",
+                            modal:false,
+                            width:1000,
+                            height:640
+                            });
+
+    }
+    function CloseModalTaskFunc()
+    {
+
+        $("#myModal").dialog( {title: "jQuery Modal Dialog Popup",
+                                            modal:false}).dialog('close');
+
+    }
+
+
+</script>
+@code {
+    public class TypeTask{
+        public int ID { get; set; }
+        public string Name { get; set; }
+    }
+    public class Department{
+        public int ID{ get; set; }
+        public string Name{ get; set; }
+    }
+    private bool Open { get; set; }
+
+    public void OnValueChanged(ChangeEventArgs e)
+    {
+        var f= e.Value;
+    }
+    TypeTask typeTask;
+    public void OnClose()
+    {
+        // TODO
+    }
+    Task_Book? hovercurrentItem;
+    IList<Task_Book>? currentItem;
+    Modal modal;
+    public Task_Book_ViewModel DataContext = SingleTBVM.Instance;
+    public List<TypeTask> typeTasks = new List<TypeTask> {
+    new TypeTask{ ID=1, Name="Временная"},
+    new TypeTask{ ID=2, Name="Постоянная"}
+    };
+
+    public async void Task_Modal_Show(){
+
+        await modal.Show();
+    }
+    public async void Task_Modal_Close(){
+
+         await modal.Close();
+    }
+    public async void d(){
+        await DataContext.Create_Task(new Task_Book());
+    }
+    
+}

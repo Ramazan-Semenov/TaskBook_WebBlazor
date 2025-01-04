@@ -1,0 +1,79 @@
+﻿ @page "/sdf"
+    @rendermode InteractiveServer
+
+    @using System.Linq.Dynamic.Core
+    @using Radzen.Blazor;
+    @using TaskBook_WebBlazor.Entity;
+    @using Radzen
+@using TaskBook_WebBlazor.ViewModel;
+
+<div class="scrollable">
+<RadzenDataGrid
+    
+    Data="@DataContext.Task_Books"
+                AllowFiltering="true"
+                FilterPopupRenderMode="PopupRenderMode.OnDemand" 
+                FilterMode="FilterMode.Advanced" 
+                AllowPaging="true"
+                AllowSorting="true"
+                lang="ru"
+                SelectionMode="DataGridSelectionMode.Single"
+                @bind-Value=@currentItem
+                GridLines="Radzen.DataGridGridLines.Both">
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Task_Book.ID)" Title="ID" />
+        <RadzenDataGridColumn Property="@nameof(Task_Book.ParentID)" Title="Родительский ID" />
+        <RadzenDataGridColumn Property="@nameof(Task_Book.Department_Name)" Title="Подразделение" />
+        <RadzenDataGridColumn Property="@nameof(Task_Book.Group_Name)" Title="Группа" />
+        <RadzenDataGridColumn Property="@nameof(Task_Book.DateTime_START)" Title="Начало" />
+        <RadzenDataGridColumn Property="@nameof(Task_Book.DateTime_END)" Title="Конец" />
+        <RadzenDataGridColumn Property="@nameof(Task_Book.Status)" Title="Статус" />
+        <RadzenDataGridColumn Property="@nameof(Task_Book.Type_Task)" Title="Тип задачи" />
+        <RadzenDataGridColumn Property="@nameof(Task_Book.Name)" Title="Название задачи" />
+        <RadzenDataGridColumn Property="@nameof(Task_Book.Category_Task)" Title="Категория" />
+        <RadzenDataGridColumn Property="@nameof(Task_Book.Excecuter)" Title="Исполнитель" />
+        <RadzenDataGridColumn Property="@nameof(Task_Book.Dectription)" Title="Описание" />
+        <RadzenDataGridColumn Property="@nameof(Task_Book.Labor_costs)" Title="Трудозатраты(План/Факт), час" />
+    </Columns>
+</RadzenDataGrid>
+
+</div>
+<style>
+    td {
+        user-select: none;
+    }
+
+    .rz-grid-table {
+        width: unset;
+    }
+
+    .rz-data-grid {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+    }
+    .rz-datatable {
+        position: relative;
+        box-shadow: var(--rz-grid-shadow);
+        border: var(--rz-grid-cell-border);
+        border-radius: var(--rz-grid-border-radius);
+        background-color: var(--rz-grid-background-color);
+        overflow: visible;
+    }
+
+    .scrollable {
+        max-width:2000px;
+        width: 100vw;
+    }
+
+    .rz-datatable-scrollable {
+        display: flex;
+        flex-direction: column;
+    }
+</style>
+@code {
+    IList<Task_Book>? currentItem;
+    Radzen.DataGridGridLines GridLines = Radzen.DataGridGridLines.Both;
+
+    public Task_Book_ViewModel DataContext = SingleTBVM.Instance;
+}
